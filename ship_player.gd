@@ -25,12 +25,14 @@ func _get_input():
 			var angle_to_mouse = global_position.direction_to(get_global_mouse_position()).angle() + PI/2
 			var angle_to_mouse_from_face = fmod((angle_to_mouse - rotation + PI), (2 * PI)) - PI
 			
-			if angle_to_mouse_from_face < 0:
+			if angle_to_mouse_from_face < -0.001:
 				rotation_input = -1
-			elif angle_to_mouse_from_face > 0:
+			elif angle_to_mouse_from_face > 0.001:
 				rotation_input = 1
+			else:
+				rotation_input = 0
 			
-			# if within a certain angle range and your angular velocity is aiming for the goal, cap ang vel
+			# if within an angle range and your angular velocity is aimed at the goal, cap ang vel
 			var threshold = PI/4
 			
 			if abs(angle_to_mouse_from_face) < threshold && sign(angular_velocity) == sign(angle_to_mouse_from_face):
