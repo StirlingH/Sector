@@ -2,6 +2,17 @@ extends ShipCharacter
 
 # only necessary for mouse look mode
 @export var max_angular_velocity: float = 2.0
+# PID Controller parameters
+@export var Kp = 4.0  # Proportional gain
+@export var Ki = 0.1  # Integral gain
+@export var Kd = 4.0  # Derivative gain
+
+# PID controller variables
+var integral = 0.0
+var previous_error = 0.0
+
+var mouse_look: bool = true
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -13,32 +24,53 @@ func _process(delta):
 	pass
 
 
-func _get_input():
-	if Input.is_action_pressed("Shift"):
+func _get_input(delta):
+	if Input.is_action_just_pressed("Flight Mode Toggle"):
+		mouse_look = !mouse_look
+		if mouse_look:
+			rotation_input = 0
+		
+	if !mouse_look:
 		rotation_input = Input.get_axis("Left", "Right")
-		thrust_input = Input.get_axis("Down", "Up")
 	else:
-		# slow down if spinning too fast
-		if abs(angular_velocity) > max_angular_velocity:
-			rotation_input = sign(angular_velocity) * -1
-		else:
-			var angle_to_mouse = global_position.direction_to(get_global_mouse_position()).angle() + PI/2
-			var angle_to_mouse_from_face = fmod((angle_to_mouse - rotation + PI), (2 * PI)) - PI
-			
-			if angle_to_mouse_from_face < -0.001:
-				rotation_input = -1
-			elif angle_to_mouse_from_face > 0.001:
-				rotation_input = 1
-			else:
-				rotation_input = 0
-			
-			# if within an angle range and your angular velocity is aimed at the goal, cap ang vel
-			var threshold = PI/4
-			
-			if abs(angle_to_mouse_from_face) < threshold && sign(angular_velocity) == sign(angle_to_mouse_from_face):
-				#scale between 0 angular velocity at no angle and max at the threshold angle
-				var scaled_max_velocity = abs(angle_to_mouse_from_face) / threshold * max_angular_velocity
-				# Clamp angular velocity while preserving sign
-				angular_velocity = sign(angular_velocity) * min(abs(angular_velocity), scaled_max_velocity)
-
+		var target_angle = (get_global_mouse_position() - global_position).angle() + PI/2
+		var current_angle = rotation
+		
+		# Calculate the angular error (shortest path)
+		var error = short_angle_distance(current_angle, target_angle)
+		
+		# Calculate integral term (with anti-windup)
+		integral += error * delta
+		integral = clamp(integral, -10.0, 10.0)  # Prevent integral windup
+		
+		# Calculate derivative term
+		var derivative = (error - previous_error) / delta
+		previous_error = error
+		
+		# Calculate PID output
+		var torque_amount = Kp * error + Ki * integral + Kd * derivative
+		
+		# Clamp torque to thrust
+		torque_amount = clamp(torque_amount, -rotation_thrust, rotation_thrust)
+		
+		# Apply torque directly - this is physically correct for rotation in space
+		apply_torque(torque_amount * 1000)
+		
+		
+		var strafe = Input.get_axis("Left", "Right")
+		var forwards = Vector2(cos(rotation - PI/2), sin(rotation - PI/2))
+		
+		if strafe > 0:
+			apply_central_force(forwards.rotated(deg_to_rad(90)) * thrust_power * delta)
+		elif strafe < 0:
+			apply_central_force(forwards.rotated(deg_to_rad(-90)) * thrust_power * delta)
+		
+	thrust_input = Input.get_axis("Down", "Up")
 	brake_active = Input.is_action_pressed("Brake")
+
+
+# Function to calculate the shortest angular distance between two angles
+func short_angle_distance(from_angle, to_angle):
+	var max_angle = 2.0 * PI
+	var difference = fmod(to_angle - from_angle, max_angle)
+	return fmod(2.0 * difference, max_angle) - difference
