@@ -57,16 +57,20 @@ func _get_input(delta):
 		apply_torque(torque_amount * 1000)
 		
 		
-		var strafe = Input.get_axis("Left", "Right")
-		var forwards = Vector2(cos(rotation - PI/2), sin(rotation - PI/2))
 		
+	thrust_input = Input.get_axis("Down", "Up")
+	brake_active = Input.is_action_pressed("Brake")
+
+
+func handle_thrust(delta):
+	super.handle_thrust(delta)
+	if mouse_look:
+		var strafe = Input.get_axis("Left", "Right")
+		var forwards = get_forwards()
 		if strafe > 0:
 			apply_central_force(forwards.rotated(deg_to_rad(90)) * thrust_power * delta)
 		elif strafe < 0:
 			apply_central_force(forwards.rotated(deg_to_rad(-90)) * thrust_power * delta)
-		
-	thrust_input = Input.get_axis("Down", "Up")
-	brake_active = Input.is_action_pressed("Brake")
 
 
 # Function to calculate the shortest angular distance between two angles

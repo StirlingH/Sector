@@ -30,8 +30,7 @@ func handle_rotation(delta):
 
 
 func handle_thrust(delta):
-	# Calculate the thrust direction based on the ship's rotation
-	var thrust_direction = Vector2(cos(rotation - PI/2), sin(rotation - PI/2))
+	var thrust_direction = get_forwards()
 	
 	if thrust_input > 0:
 		apply_central_force(thrust_direction * thrust_power * delta)
@@ -48,3 +47,8 @@ func handle_brake():
 	else:
 		linear_damp = 0
 		angular_damp = 0
+
+
+## Calculate the thrust direction based on the ship's rotation.
+func get_forwards():
+	return Vector2(cos(rotation - PI/2), sin(rotation - PI/2))
