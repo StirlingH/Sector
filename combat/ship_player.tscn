@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dl53abkb56p8k"]
 
-[ext_resource type="Script" uid="uid://3rgce43hoye1" path="res://ship_player.gd" id="1_13gb8"]
-[ext_resource type="Texture2D" uid="uid://bfgtuthxcrt2j" path="res://icon.svg" id="2_g8xu5"]
+[ext_resource type="Script" uid="uid://3rgce43hoye1" path="res://combat/ship_player.gd" id="1_13gb8"]
+[ext_resource type="Texture2D" uid="uid://bfgtuthxcrt2j" path="res://combat/icon.svg" id="2_g8xu5"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_kl1mr"]
 friction = 0.0

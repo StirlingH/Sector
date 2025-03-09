@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="Sector"
-run/main_scene="res://ship_player.tscn"
+run/main_scene="uid://1rirfjkaqbqq"
 config/features=PackedStringArray("4.4", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://combat/icon.svg"
 
 [input]
 
