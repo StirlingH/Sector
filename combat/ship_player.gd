@@ -1,4 +1,4 @@
-extends ShipCharacter
+extends Ship
 
 # only necessary for mouse look mode
 @export var max_angular_velocity: float = 2.0

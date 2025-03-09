@@ -1,5 +1,5 @@
 extends RigidBody2D
-class_name ShipCharacter
+class_name Ship
 
 
 @export var thrust_power: float = 10000.0
