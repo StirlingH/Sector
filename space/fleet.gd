@@ -66,7 +66,6 @@ func scale_to_max(vector: Vector2, max_value: float) -> Vector2:
 
 func handle_rotation(delta):
 	if linear_velocity.length() < min_vel_for_rot:
-		print("no torque")
 		return
 	var target_angle = (linear_velocity).angle() + PI/2
 	var current_angle = rotation
